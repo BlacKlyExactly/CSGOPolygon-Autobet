@@ -33,7 +33,7 @@ const colors = {
 
 const panelHTML = `
     <style>
-        button{
+        .btn{
             height: 40px;
             width: 46%;
             margin-right: 10px;
@@ -60,7 +60,7 @@ const panelHTML = `
             border-radius: 10px;
         }
 
-        h2{
+        .title{
             width: 100%;
             color: white;
             font-size: 26px;
@@ -119,7 +119,7 @@ const panelHTML = `
         }
     </style>
     <div class="auto-bet">
-        <h2>Auto bet: ${scriptStates[false]}</h2>
+        <h2 class="title">Auto bet: ${scriptStates[false]}</h2>
         <div class="auto-bet__start-bet">
             <label>
                 <p>Bet startowy</p> <br>
@@ -132,8 +132,8 @@ const panelHTML = `
             }</span></p>
             <p>Aktualny bet: <span class="auto-bet__current-bet"></span></p>
         </div>
-        <button class="green_inline auto-bet__start">Start</button>
-        <button class="red_inline auto-bet__stop">Stop</button>
+        <button class="green_inline auto-bet__start btn">Start</button>
+        <button class="red_inline auto-bet__stop btn">Stop</button>
     </div>
 `;
 
@@ -190,7 +190,6 @@ const observer = new MutationObserver((mutations) => {
 
     if (lastColor !== selectedColor) {
       isStarted && beted && (bet *= 2);
-      console.log(beted);
       currentBetPanel.innerText = bet;
     }
 
