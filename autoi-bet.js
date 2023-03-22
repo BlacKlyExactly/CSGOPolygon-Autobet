@@ -154,10 +154,12 @@ const betButtons = {
 
 let lastColor = balls.lastChild.children[0].classList[0];
 let selectedColor = balls.lastChild.children[0].classList[0];
-let bet = 10;
+let bet = 0;
+let startBet = 0;
 let isStarted = false;
 let isRolling = false;
 let beted = false;
+let lastGreen = false;
 
 const doBet = () => {
   if (!betInput || !isStarted) return;
@@ -171,6 +173,7 @@ const changeState = (newState) => {
   if (!startBetInput.value && newState) return;
 
   bet = parseInt(startBetInput.value) || "";
+  startBet = bet;
 
   isStarted = newState;
   state.innerHTML = scriptStates[newState];
@@ -181,29 +184,30 @@ const changeState = (newState) => {
   !isRolling && doBet();
 };
 
+const onRollEnd = (mutation) => {
+  lastColor = mutation.addedNodes[0].childNodes[0].classList[0];
+  lastColorPanel.innerHTML = colors[lastColor];
+
+  if (lastColor !== selectedColor) {
+    isStarted && beted && (bet *= 2);
+    currentBetPanel.innerText = bet;
+  }
+
+  lastColor === selectedColor && (bet = startBet);
+
+  if (isStarted) {
+    lastColor === "green" && (lastGreen = true);
+    selectedColor = lastColor;
+  }
+
+  beted = false;
+  !lastGreen && setTimeout(() => doBet(), 5000);
+
+  lastGreen = false;
+};
+
 const observer = new MutationObserver((mutations) => {
-  mutations.forEach((mutation) => {
-    if (!mutation.addedNodes.length) return;
-
-    lastColor = mutation.addedNodes[0].childNodes[0].classList[0];
-    lastColorPanel.innerHTML = colors[lastColor];
-
-    if (lastColor !== selectedColor) {
-      isStarted && beted && (bet *= 2);
-      currentBetPanel.innerText = bet;
-    }
-
-    if (isStarted) {
-      selectedColor =
-        lastColor === "green"
-          ? balls.children[balls.children.length - 2]?.children?.[0]
-              .classList?.[0] || "black"
-          : lastColor;
-    }
-
-    beted = false;
-    setTimeout(() => doBet(), 2000);
-  });
+  mutations.forEach((mutation) => onRollEnd(mutation));
 });
 
 balls && observer.observe(balls, { childList: true });
