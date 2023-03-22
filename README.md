@@ -1,5 +1,7 @@
 # CSGOPolygon-Autobet
 
+![](https://cdn.discordapp.com/attachments/747723783544242299/1088074788922204200/image.png)
+
 ## Użycie
 1. Prawy przycisk myszy.
 2. Kliknij na "Zbadaj element"
