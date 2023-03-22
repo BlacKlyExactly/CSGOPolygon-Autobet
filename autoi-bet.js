@@ -193,9 +193,15 @@ const observer = new MutationObserver((mutations) => {
       currentBetPanel.innerText = bet;
     }
 
-    isStarted && (selectedColor = lastColor);
-    beted = false;
+    if (isStarted) {
+      selectedColor =
+        lastColor === "green"
+          ? balls.children[balls.children.length - 2]?.children?.[0]
+              .classList?.[0] || "black"
+          : lastColor;
+    }
 
+    beted = false;
     setTimeout(() => doBet(), 2000);
   });
 });
