@@ -190,12 +190,11 @@ const onRollEnd = (mutation) => {
   lastColor = balls.lastChild.children[0].classList[0];
   lastColorPanel.innerHTML = colors[lastColor];
 
-  if (lastColor !== selectedColor) {
-    isStarted && beted && (bet *= 2);
-    currentBetPanel.innerText = bet;
-  }
+  lastColor !== selectedColor
+    ? isStarted && beted && (bet *= 2)
+    : (bet = startBet);
 
-  lastColor === selectedColor && (bet = startBet);
+  currentBetPanel.innerText = bet;
 
   if (isStarted) {
     lastColor === "green" && (lastGreen = true);
@@ -203,7 +202,7 @@ const onRollEnd = (mutation) => {
   }
 
   beted = false;
-  !lastGreen && setTimeout(() => doBet(), 5000);
+  !lastGreen && setTimeout(() => doBet(), 10000);
 
   lastGreen = false;
 };
