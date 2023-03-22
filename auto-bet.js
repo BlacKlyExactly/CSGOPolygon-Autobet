@@ -5,7 +5,7 @@ const balls = document.querySelector(
 );
 
 const betRedButton = document.querySelector(
-  "#select_roulette > div.rounds > div.round.round_red > div.round_button > div > ul > li:nth-child(1) > span"
+  "#select_roulette > div.rounds > div.round.round_red > div.round_button > div > button"
 );
 
 const betGreenButton = document.querySelector(
@@ -13,7 +13,7 @@ const betGreenButton = document.querySelector(
 );
 
 const betBlackButton = document.querySelector(
-  "#select_roulette > div.rounds > div.round.round_black > div.round_button > div > ul > li:nth-child(1) > span"
+  "#select_roulette > div.rounds > div.round.round_black > div.round_button > div > button"
 );
 
 const panel = document.querySelector(".leftSide");
@@ -185,7 +185,9 @@ const changeState = (newState) => {
 };
 
 const onRollEnd = (mutation) => {
-  lastColor = mutation.addedNodes[0].childNodes[0].classList[0];
+  if (!mutation.addedNodes.length) return;
+
+  lastColor = balls.lastChild.children[0].classList[0];
   lastColorPanel.innerHTML = colors[lastColor];
 
   if (lastColor !== selectedColor) {
