@@ -79,13 +79,13 @@ const panelHTML = `
             margin-bottom: 15px;
         }
 
-        .auto-bet__start-bet{
+        .auto-bet__start-bet, .auto-bet__max-bet{
             font-weight: 700;
             color: white;
             margin-bottom: 30px;
         }
 
-        .auto-bet__start-bet input{
+        .auto-bet__start-bet input, .auto-bet__max-bet input{
             width: calc(100% - 30px);
             height: 38px;
             background: #2F2F34;
@@ -94,7 +94,11 @@ const panelHTML = `
             padding: 0 10px;
         }
 
-        label{
+        .data span{
+          font-weight: bold;
+        }
+
+        .auto-bet label{
             width: 100%;
         }
 
@@ -123,14 +127,21 @@ const panelHTML = `
         <div class="auto-bet__start-bet">
             <label>
                 <p>Bet startowy</p> <br>
-                <input type="number" class="auto-bet__start-bet-input">
+                <input type="number">
+            </label>
+        </div>
+        <div class="auto-bet__max-bet">
+            <label>
+                <p>Max bet</p> <br>
+                <input type="number">
             </label>
         </div>
         <div class="data">
-            <p>Ostatni kolor: <span class="auto-bet__last-color">${
+            <p>Ostatni wylosowany kolor: <span class="auto-bet__last-color">${
               colors[balls.lastChild.children[0].classList[0]]
             }</span></p>
-            <p>Aktualny bet: <span class="auto-bet__current-bet"></span></p>
+            <p>Maksymalny bet: <span class="auto-bet__current-max-bet">Brak</span></p>
+            <p>Aktualny bet: <span class="auto-bet__current-bet">Brak</span></p>
         </div>
         <button class="green_inline auto-bet__start btn">Start</button>
         <button class="red_inline auto-bet__stop btn">Stop</button>
@@ -139,11 +150,13 @@ const panelHTML = `
 
 panel.innerHTML = panelHTML + panel.innerHTML;
 
-const startBetInput = document.querySelector(".auto-bet__start-bet-input");
+const startBetInput = document.querySelector(".auto-bet__start-bet input");
+const maxBetInput = document.querySelector(".auto-bet__max-bet input");
 const startButton = document.querySelector(".auto-bet__start");
 const stopButton = document.querySelector(".auto-bet__stop");
 const lastColorPanel = document.querySelector(".auto-bet__last-color");
 const currentBetPanel = document.querySelector(".auto-bet__current-bet");
+const maxBetPanel = document.querySelector(".auto-bet__current-max-bet");
 const state = document.querySelector(".auto-bet__state");
 
 const betButtons = {
@@ -156,6 +169,7 @@ let lastColor = balls.lastChild.children[0].classList[0];
 let selectedColor = balls.lastChild.children[0].classList[0];
 let bet = 0;
 let startBet = 0;
+let maxBet = 0;
 let isStarted = false;
 let isRolling = false;
 let beted = false;
@@ -170,16 +184,21 @@ const doBet = () => {
 };
 
 const changeState = (newState) => {
-  if (!startBetInput.value && newState) return;
+  if ((!startBetInput.value && newState) || isStarted === newState) return;
 
-  bet = parseInt(startBetInput.value) || "";
+  bet = parseInt(startBetInput.value) || 0;
+  maxBet = parseInt(maxBetInput.value) || 0;
+
   startBet = bet;
 
   isStarted = newState;
   state.innerHTML = scriptStates[newState];
-  currentBetPanel.innerText = bet;
+
+  currentBetPanel.innerText = bet || "Brak";
+  maxBetPanel.innerHTML = maxBet || "Brak";
 
   startBetInput.value = "0";
+  maxBetInput.value = "0";
 
   !isRolling && doBet();
 };
@@ -190,9 +209,13 @@ const onRollEnd = (mutation) => {
   lastColor = balls.lastChild.children[0].classList[0];
   lastColorPanel.innerHTML = colors[lastColor];
 
-  lastColor !== selectedColor
-    ? isStarted && beted && (bet *= 2)
-    : (bet = startBet);
+  bet =
+    lastColor !== selectedColor &&
+    (maxBet ? bet * 2 <= maxBet : true) &&
+    isStarted &&
+    beted
+      ? bet * 2
+      : startBet;
 
   currentBetPanel.innerText = bet;
 
@@ -201,10 +224,10 @@ const onRollEnd = (mutation) => {
     selectedColor = lastColor;
   }
 
+  lastColor !== "green" && (lastGreen = false);
+
   beted = false;
   !lastGreen && setTimeout(() => doBet(), 10000);
-
-  lastGreen = false;
 };
 
 const observer = new MutationObserver((mutations) => {
@@ -216,10 +239,10 @@ balls && observer.observe(balls, { childList: true });
 startButton.addEventListener("click", () => changeState(true));
 stopButton.addEventListener("click", () => changeState(false));
 
-setTimeout(() => {
+setInterval(() => {
   const progress = document.querySelector(
     "#select_roulette > div.rolling > div.progress > span"
   );
 
   isRolling = progress.innerText === "***ROLLING***";
-}, 100);
+}, 500);
