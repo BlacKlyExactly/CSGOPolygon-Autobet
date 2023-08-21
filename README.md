@@ -13,6 +13,6 @@ Prosty skrypt na betowanie ostatniego wylosowanego koloru na ruletce CSGOPolygon
 
 ```js
 fetch("https://raw.githubusercontent.com/BlacKlyExactly/CSGOPolygon-Autobet/main/auto-bet.js")
-.then(( res ) => res.text())
+.then((res) => res.text())
 .then((t) => eval(t));
 ```
